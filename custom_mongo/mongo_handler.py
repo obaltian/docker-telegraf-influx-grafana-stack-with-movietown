@@ -13,7 +13,7 @@ sys.path.append("..")
 from utils import config
 
 # connection and authentication info
-HOST = "localhost"
+HOST = "mongodb"
 PORT = 27017
 USERNAME = "mongo"
 PASSWORD = "Eqqz6fXGyhXTpmN8"
@@ -85,7 +85,7 @@ class MongoHandler:
             print(e)
             print("Connection failed. See the above details.")
             return None
-        
+
         # just in case check the connection again
         if not self.running():
             print("Connection failed.")
@@ -196,7 +196,7 @@ class MongoHandler:
             print("An error occured operation will stop. See details:")
             print(e)
             return None
-    
+
     def user_update_mail(self, id: str, mail: str):
         try:
             self.user_collection.update_one(
@@ -244,10 +244,10 @@ class MongoHandler:
             res = self.watchlist_collection.find_one({"u_id": id})
             watch_list = res.get("u_watchlist", "None")
 
-            
+
             if (watch_list == "None") or (watch_list is None):
                 return []
-            
+
             parsed_list = json.loads(watch_list)
             return parsed_list.get("list")
         except Exception as e:
@@ -264,7 +264,7 @@ class MongoHandler:
             print("An error occured operation will stop. See details:")
             print(e)
             return None
-    
+
     def watchlist_update_reminder(self, id: str, date: datetime.datetime):
         try:
             self.watchlist_collection.update_one(
@@ -284,11 +284,11 @@ class MongoHandler:
 
                 total_movies = df.shape[0]
                 total_done = 0
-                
+
                 for i in df.to_dict("records"):
                     if total_done % 1000 == 0:
                         print(f"Movies added {total_done}/{total_movies}")
-                    
+
                     movie_struct = {
                         "m_id": i.get("id", "None"),
                         "m_imdb_id": i.get("imdb_title_id", "None"),
@@ -307,7 +307,7 @@ class MongoHandler:
                     }
                     self.movie_collection.insert_one(movie_struct)
                     total_done += 1
-    
+
                 print(f"Movies added {total_done}/{total_movies}")
         except Exception as e:
             print("An error occured operation will stop. See details:")
@@ -327,8 +327,8 @@ class MongoHandler:
         except Exception as e:
             print("An error occured operation will stop. See details:")
             print(e)
-            return None       
-    
+            return None
+
     def movie_get_count(self) -> int:
         try:
             return self.movie_collection.count()
@@ -340,11 +340,11 @@ class MongoHandler:
 if __name__ == "__main__":
     print("Creating an instance of Mongo handler.")
     inst = MongoHandler()
-    
+
     if not inst:
         print("Failed to create an instance. Exiting.")
         exit(-1)
-    
+
     while True:
         print("***********************")
         print("1. Check connection")

@@ -3,7 +3,7 @@ from redis import Redis
 from typing import Any
 
 # connection and authentication info
-HOST = "localhost"
+HOST = "redis"
 PORT = 6379
 
 # general info
@@ -24,7 +24,7 @@ class RedisHandler:
 
         if not self.running():
             print("Connection failed.")
-            return None    
+            return None
 
     def running(self) -> bool:
         try:
@@ -37,7 +37,7 @@ class RedisHandler:
             while i <= MAX_RECONNECT_COUNT:
                 print(f"Trying to reconnect [{i}/{MAX_RECONNECT_COUNT}]")
                 try:
-                    self.client = Redis(host=HOST, port=PORT) 
+                    self.client = Redis(host=HOST, port=PORT)
                     if self.client.ping():
                         print("Successfully reconnected.")
                         return True
@@ -60,7 +60,7 @@ class RedisHandler:
             print("An error occured operation will stop. See details:")
             print(e)
             return None
-    
+
     def retrieve(self, keyword: str):
         try:
             self.client.get(keyword)
@@ -68,7 +68,7 @@ class RedisHandler:
             print("An error occured operation will stop. See details:")
             print(e)
             return None
-    
+
     def reset(self):
         try:
             self.client.flushall()

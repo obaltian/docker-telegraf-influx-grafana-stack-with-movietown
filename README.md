@@ -24,7 +24,7 @@ The general design philosophy is to be as eye-candy as possible! There are blur 
 ![Login/Signup Page](/data/side_by_side.jpg)
 
 # The Technology
-On my website users can create and login to their account. 
+On my website users can create and login to their account.
 Most, if not all features are available only when you login. All passwords and other sensitive info are encrypted before saved to the database.
 
 ![Docker Services](/data/docker.png)
@@ -44,7 +44,7 @@ Bcyrpt # Used to 'encrypt' passwords
 Pandas # Used to manipulate CSV files
 ```
 
-Main database is MongoDB. All the movies, users and 
+Main database is MongoDB. All the movies, users and
 other information are stored there (locally). There is
 ElasticSearch built on top of it. Search operations from the user are queried from this database.
 
@@ -182,10 +182,10 @@ MongoDB, ElasticSearch, Redis and RabbitMQ can be deployed using the docker-comp
 $ docker-compose up -d # Download the services and run them
 
 $ docker ps --format "{{.ID}}\\t{{.Status}}\\t{{.Names}}" # Check if they are running
-> 6343c28c8b4b	Up 2 hours	mongodb-service
-> 134adbf3f58c	Up 2 hours	elastic-service
+> 6343c28c8b4b	Up 2 hours	mongodb
+> 134adbf3f58c	Up 2 hours	elastic
 > 213776ec6028	Up 2 hours	rabbit-service
-> 2b314e48c465	Up 2 hours	redis-service
+> 2b314e48c465	Up 2 hours	redis
 ```
 
 ### **Initialize Databases**

@@ -3,7 +3,7 @@ import uuid
 import time
 
 # connection and authentication info
-HOST = "localhost"
+HOST = "elastic"
 PORT = 9200
 USERNAME = ""
 PASSWORD = ""
@@ -33,7 +33,7 @@ class ElasticHandler():
     def __init__(self):
         self.client = elasticsearch.Elasticsearch(
             hosts=HOST, port=PORT,
-            http_auth=(USERNAME, PASSWORD)) 
+            http_auth=(USERNAME, PASSWORD))
 
         # just in case check the connection again
         if not self.running():
@@ -48,7 +48,7 @@ class ElasticHandler():
                 print("An error occured operation will stop. See details:")
                 print(e)
                 return None
-        
+
         print("Elasticsearch initialization successful.")
 
     def running(self) -> bool:
@@ -62,7 +62,7 @@ class ElasticHandler():
             try:
                 self.client = elasticsearch.Elasticsearch(
                     hosts=HOST, port=PORT,
-                    http_auth=(USERNAME, PASSWORD)) 
+                    http_auth=(USERNAME, PASSWORD))
                 if self.client.ping():
                     print("Successfully reconnected.")
                     return True
@@ -116,9 +116,9 @@ class ElasticHandler():
             print("[ELASTIC] An error occured when adding movie. See details:")
             print(e)
             return False
-        
+
         return True
-    
+
     def movie_delete(self, target_id: str) -> bool:
         try:
             self.client.delete(
@@ -147,7 +147,7 @@ class ElasticHandler():
                 }
             }
         }
-        
+
         try:
             response = self.client.search(
                 index=INDEX_NAME,
@@ -195,7 +195,7 @@ class ElasticHandler():
             result_size = response.get("hits").get("total").get("value")
             if result_size == 0:
                 return []
-            
+
             # obtain results
             result_list: list = response.get("hits").get("hits")
 
@@ -240,7 +240,7 @@ if __name__ == "__main__":
                 "Alexander Black", "Alexander Black",
                 "Alexander Black Photoplays", "Blanche Bayliss, William Courtenay, Chauncey Depew",
                 "The adventures of a female reporter in the 1890s.", 5.9,
-                "no_path" 
+                "no_path"
             )
             print(result)
         elif op == "3":
@@ -248,4 +248,3 @@ if __name__ == "__main__":
             print(result)
         else:
             print("Invalid operation, try again.")
-        
