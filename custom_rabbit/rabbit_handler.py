@@ -10,7 +10,7 @@ from pika.spec import Basic
 from pika.spec import BasicProperties
 
 # connection and authentication info
-HOST = "localhost"
+HOST = "rabbit"
 PORT = 5672
 USERNAME = "rabbit"
 PASSWORD = "oFbmhtLdJz5GCYt5"
@@ -55,7 +55,7 @@ class RabbitHandler():
         except Exception as e:
             print("An error occured when connecting to RabbitMQ.")
             return None
-        
+
         # intialize channel
         self.channel = self.client.channel()
         self.channel_number= self.channel.channel_number
@@ -63,7 +63,7 @@ class RabbitHandler():
         # initialize queues
         self.channel.queue_declare(REQUEST_QUEUE_NAME)
         self.channel.queue_declare(RESULT_QUEUE_NAME)
-        
+
         self.is_running = True
 
     def running(self) -> bool:
@@ -82,7 +82,7 @@ class RabbitHandler():
         if self.channel.is_open:
             print("Channel is open")
             return True
-        
+
         # no active connection found
         print("Connection dropped.")
         i = 1
@@ -95,12 +95,12 @@ class RabbitHandler():
             except Exception as e:
                 i += 1
                 time.sleep(1)
-                
+
         return False
 
     def get_channel_number(self) -> int:
         return self.channel_number
-    
+
     def request_add(
         self, owner: str, operation: str, data: str, extras) -> bool:
         request_queue_struct = {
@@ -125,7 +125,7 @@ class RabbitHandler():
             return False
 
     def result_add(
-        self, owner: str, operation: str, 
+        self, owner: str, operation: str,
         result: str, data: str, extras) -> bool:
         result_queue_struct = {
             "owner": owner,
@@ -155,7 +155,7 @@ class RabbitHandler():
 
     def get_channel(self) -> BlockingChannel:
         return self.channel
-    
+
     def get_request_queue_name(self) -> str:
         return REQUEST_QUEUE_NAME
 
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     if not inst.running():
         print("Failed to create an instance. Exiting.")
         exit(-1)
-    
+
     while True:
         print("***********************")
         print("1. Check connection")
