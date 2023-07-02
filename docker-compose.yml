@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  rabbit-service:
+  rabbit:
     image: rabbitmq:3.9.7-management-alpine
     container_name: rabbit-service
     hostname: rabbit-service
