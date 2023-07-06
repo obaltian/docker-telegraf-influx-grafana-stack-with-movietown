@@ -73,11 +73,11 @@ except Exception as e:
 try:
     ELASTIC_CLIENT = elastic_handler.ElasticHandler()
 except Exception as e:
-    FLASK_LOGGER.log_error(f"Connection failed to ElasticSearch.\n\t{e}") 
+    FLASK_LOGGER.log_error(f"Connection failed to ElasticSearch.\n\t{e}")
 try:
     RABBIT_CLIENT = rabbit_handler.RabbitHandler()
 except Exception as e:
-    FLASK_LOGGER.log_error(f"Connection failed to RabbitMQ.\n\t{e}")  
+    FLASK_LOGGER.log_error(f"Connection failed to RabbitMQ.\n\t{e}")
 
 # global variables
 UPDATE_RATE = 10 # per second
@@ -131,7 +131,7 @@ def sign_up():
         anon_id = str(anon_id)
         RABBIT_CLIENT.request_add(
             anon_id, "handle_signup", json.dumps(form), "")
-        
+
         # wait for the results
         results = get_results(anon_id)
 
@@ -170,7 +170,7 @@ def sign_up():
             }
 
             return json.dumps(data)
-    
+
     return render_template("sign-up.html")
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -191,11 +191,11 @@ def login():
         RABBIT_CLIENT.request_add(
             anon_id, "handle_login", json.dumps(form), ""
         )
-        
+
         results = get_results(anon_id)
 
         result = results.get("result")
-        
+
         # login validated
         if result == "success":
             RABBIT_CLIENT.request_add(
@@ -223,7 +223,7 @@ def login():
                 "result": result
             }
             return json.dumps(data)
-        
+
         # login failed
         FLASK_LOGGER.log_warning(
             f"User: {form.get('username')} failed to log in. ({result})")
@@ -231,7 +231,7 @@ def login():
             "result": results.get("data")
         }
         return json.dumps(data)
-        
+
     return render_template("login.html")
 
 @app.route("/logout", methods=['GET', 'POST'])
@@ -244,7 +244,7 @@ def logout():
             f"User: {session.get('u_username')} logged out.")
         session.pop("username")
         return redirect(url_for("home"))
-    
+
     return redirect(url_for("home"))
 
 @app.route("/profile", methods=['GET', 'POST'])
@@ -256,7 +256,7 @@ def profile():
         usr = session.get("username")
         return render_template(
             "profile_base.html", user=usr, welcoming=feature_pack.get_str_time())
-    
+
     return redirect(url_for("login"))
 
 @app.route("/profile-panel", methods=['POST'])
@@ -306,7 +306,7 @@ def password():
             }
 
             RABBIT_CLIENT.request_add(
-                usr.get("u_id"), "handle_password_change", 
+                usr.get("u_id"), "handle_password_change",
                 json.dumps(data), ""
             )
 
@@ -318,7 +318,7 @@ def password():
                 return json.dumps({"result": result})
 
             return json.dumps({"result": "fail"})
-    
+
     return json.dumps({"result": "fail"})
 
 @app.route("/search", methods=['GET', 'POST'])
@@ -330,7 +330,7 @@ def search():
         usr = session.get("username")
 
         return render_template("search.html", user=usr)
-    
+
     return redirect(url_for("login"))
 
 @app.route("/process-search", methods=['POST'])
@@ -366,7 +366,7 @@ def process_search():
                     data = {
                         "result": "success",
                         "result_size": result_size,
-                        "data": movie_cards         
+                        "data": movie_cards
                     }
 
                     return json.dumps(data)
@@ -429,7 +429,7 @@ def process_watchlist():
                 movie_cards.append(
                     render_template("movie_card.html", movie=movies[i], job="remove", number=i)
                 )
-            
+
             # send them to AJAX
             data = {
                 "result": "success",
@@ -450,7 +450,7 @@ def process_watchlist():
             if result == "success":
                 return json.dumps({"result": "success"})
             return json.dumps({"result": "fail"})
-    
+
     return json.dumps({"result": "fail"})
 
 def watchdog():
@@ -471,7 +471,7 @@ def watchdog():
         if (1 / UPDATE_RATE) <= delta:
             # TODO: write the code here
             if FIRST_RUN:
-                # TODO: to be executed on the first run 
+                # TODO: to be executed on the first run
                 FIRST_RUN = False
 
             # obtain integrity between mongo and elastic
@@ -506,7 +506,7 @@ def result_callback(
         if RESULT_LIST[i].get("owner") == parsed_result.get("owner"):
             RESULT_LIST.pop(i)
             break
-    
+
     RESULT_LIST.append(parsed_result)
     FLASK_LOGGER.log_info("Placed the result.")
 
@@ -516,7 +516,7 @@ def broker():
     broker_client = rabbit_handler.RabbitHandler()
     broker_channel = broker_client.get_channel()
     broker_channel_name = broker_client.get_result_queue_name()
-    
+
     # start broking result queue
     broker_channel.basic_consume(
         queue=broker_channel_name,
@@ -533,7 +533,7 @@ if __name__ == "__main__":
 
     if not MONGO_CLIENT.running():
         FLASK_LOGGER.log_error("Mongo client is not running. Aborting.")
-    
+
     if not ELASTIC_CLIENT.running():
         FLASK_LOGGER.log_error("Elastic client is not running. Aborting.")
 
@@ -561,7 +561,7 @@ if __name__ == "__main__":
         t_broker.start()
 
         RUNNING = True
-        app.run()
+        app.run(host="0.0.0.0", port=9091)
         RUNNING = False
 
         t_watchdog.join()
