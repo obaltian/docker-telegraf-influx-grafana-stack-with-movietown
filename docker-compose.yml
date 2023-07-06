@@ -3,8 +3,8 @@ version: "3.7"
 services:
   rabbit:
     image: rabbitmq:3.9.7-management-alpine
-    container_name: rabbit-service
-    hostname: rabbit-service
+    container_name: rabbit
+    hostname: rabbit
     environment:
       - RABBITMQ_DEFAULT_USER=rabbit
       - RABBITMQ_DEFAULT_PASS=oFbmhtLdJz5GCYt5
