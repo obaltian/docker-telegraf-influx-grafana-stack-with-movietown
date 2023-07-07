@@ -53,7 +53,6 @@ FLASK_LOGGER = logger.CustomLogger()
 
 # global flask app
 app = Flask(__name__)
-RUNNING = False
 
 # init dbs
 REDIS_CLIENT: redis_handler.RedisHandler
@@ -326,52 +325,52 @@ def search():
     """
     method to be called when wisiting '/profile'
     """
-    if "username" in session:
-        usr = session.get("username")
+    #if "username" in session:
+    usr = session.get("username")
 
-        return render_template("search.html", user=usr)
+    return render_template("search.html", user=usr)
 
-    return redirect(url_for("login"))
+    #return redirect(url_for("login"))
 
 @app.route("/process-search", methods=['POST'])
 def process_search():
     """
     method to be called by jQuery to process search strings
     """
-    if "username" in session:
-        usr = session.get("username")
-        search_str = request.form.get("search_str")
-        if search_str:
-            RABBIT_CLIENT.request_add(
-                usr.get("u_id"), "handle_search",
-                search_str, ""
-            )
+    user_id = session.get("username", {}.get("u_id")) or str(uuid.uuid4())
 
-            results = get_results(usr.get("u_id"))
-            result = results.get("result")
+    search_str = request.form.get("search_str")
+    FLASK_LOGGER.log_info(f"{user_id=}, {search_str=}")
+    if search_str:
+        RABBIT_CLIENT.request_add(
+            user_id, "handle_search",
+            search_str, ""
+        )
 
-            if result == "success":
-                results = results.get("data")
-                if results:
-                    results = json.loads(results)
+        results = get_results(user_id)
+        result = results.get("result")
+        FLASK_LOGGER.log_info(f"{result=}")
 
-                    result_size = len(results)
+        if result == "success":
+            results = results.get("data")
+            if results:
+                results = json.loads(results)
 
-                    movie_cards = []
-                    for i in range(len(results)):
-                        movie_cards.append(
-                            render_template("movie_card.html", movie=results[i], job="add", number=i)
-                        )
+                result_size = len(results)
 
-                    data = {
-                        "result": "success",
-                        "result_size": result_size,
-                        "data": movie_cards
-                    }
+                movie_cards = []
+                for i in range(len(results)):
+                    movie_cards.append(
+                        render_template("movie_card.html", movie=results[i], job="add", number=i)
+                    )
 
-                    return json.dumps(data)
-                else:
-                    return json.dumps({"result": "empty"})
+                data = {
+                    "result": "success",
+                    "result_size": result_size,
+                    "data": movie_cards
+                }
+
+                return json.dumps(data)
             else:
                 return json.dumps({"result": "empty"})
         else:
@@ -526,7 +525,7 @@ def broker():
 
     broker_channel.start_consuming()
 
-if __name__ == "__main__":
+def get_app():
     # check dbs
     if not REDIS_CLIENT.running():
         FLASK_LOGGER.log_error("Redis client is not running. Aborting.")
@@ -554,19 +553,15 @@ if __name__ == "__main__":
     # reset the session before start
 
     FLASK_LOGGER.log_info("Starting the main Flask App")
-    try:
-        t_watchdog = threading.Thread(target=watchdog)
-        t_watchdog.start()
-        t_broker = threading.Thread(target=broker)
-        t_broker.start()
+    t_watchdog = threading.Thread(target=watchdog)
+    t_watchdog.start()
+    t_broker = threading.Thread(target=broker)
+    t_broker.start()
 
-        RUNNING = True
-        app.run(host="0.0.0.0", port=9091)
-        RUNNING = False
+    FLASK_LOGGER.log_info(f"{app=}")
+    return app
 
-        t_watchdog.join()
-        t_broker.join()
-    except Exception as e:
-        FLASK_LOGGER.log_error(f"Something went wrong. Aborting.\n\t{e}")
-        exit(-1)
-    FLASK_LOGGER.log_info("What a successful run! Goob job.")
+    # app.run(host="0.0.0.0", port=9091)
+
+    t_watchdog.join()
+    t_broker.join()

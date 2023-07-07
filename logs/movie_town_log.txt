@@ -1,6 +1,0 @@
-2023-02-18 21:46:33,658 [INFO] [main.py] Retriving result.
-2023-02-18 21:46:33,690 [INFO] [main.py] Placed the result.
-2023-02-18 21:46:45,550 [INFO] [main.py] Retriving result.
-2023-02-18 21:46:45,557 [INFO] [main.py] Placed the result.
-2023-02-18 21:46:48,474 [INFO] [main.py] Retriving result.
-2023-02-18 21:46:48,481 [INFO] [main.py] Placed the result.

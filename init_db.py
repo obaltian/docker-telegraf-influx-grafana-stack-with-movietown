@@ -9,7 +9,7 @@ if __name__ == "__main__":
     if not mongo_inst.running():
         print("Failed to connect to MongoDB server.")
         exit(-1)
-    
+
     if not elastic_inst.running():
         print("Failed to connect to ElasticSearch server.")
         exit(-1)
